@@ -227,7 +227,9 @@ class CompilerConfig:
     ):
         self.repeats: Optional[int] = repeats
         self.repetition_period: Optional[float] = repetition_period
-        self.results_format: QuantumResultsFormat = results_format or QuantumResultsFormat().binary_count()
+        self.results_format: QuantumResultsFormat = (
+            results_format or QuantumResultsFormat().binary_count()
+        )
         self.metrics: MetricsType = metrics
         self.active_calibrations: List[CalibrationArguments] = active_calibrations or []
         self.optimizations: Optional[OptimizationConfig] = optimizations
