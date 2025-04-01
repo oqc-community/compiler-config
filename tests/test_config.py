@@ -4,7 +4,7 @@
 from sys import __loader__
 
 import pytest
-from conftest import SUPPORTED_CONFIG_VERSIONS, TestType, _get_contents
+from conftest import SUPPORTED_CONFIG_VERSIONS, TestType, get_contents
 
 from compiler_config.config import (
     CompilerConfig,
@@ -152,7 +152,7 @@ def test_config_deserialization_raises_error():
 
 @pytest.mark.parametrize("version", SUPPORTED_CONFIG_VERSIONS)
 def test_json_version_compatibility_default(version):
-    serialised_data = _get_contents(f"serialised_default_compiler_config_{version}.json")
+    serialised_data = get_contents(f"serialised_default_compiler_config_{version}.json")
     deserialised_conf = CompilerConfig.create_from_json(serialised_data)
     assert deserialised_conf.metrics == MetricsType.Default
     assert deserialised_conf.results_format == QuantumResultsFormat()
@@ -160,7 +160,7 @@ def test_json_version_compatibility_default(version):
 
 @pytest.mark.parametrize("version", SUPPORTED_CONFIG_VERSIONS)
 def test_json_version_compatibility_full(version):
-    serialised_data = _get_contents(f"serialised_full_compiler_config_{version}.json")
+    serialised_data = get_contents(f"serialised_full_compiler_config_{version}.json")
     deserialised_conf = CompilerConfig.create_from_json(serialised_data)
     assert deserialised_conf.repeats == 1000
     assert deserialised_conf.repetition_period == 10
