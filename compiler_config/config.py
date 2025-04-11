@@ -8,7 +8,6 @@ import sys
 import warnings
 from enum import Enum, Flag, IntEnum, auto
 from typing import List, Optional
-import warnings
 
 from compiler_config.serialiser import json_dumps, json_loads
 
