@@ -225,7 +225,7 @@ class CompilerConfig:
         active_calibrations=None,
         optimizations: "OptimizationConfig" = None,
         error_mitigation: ErrorMitigationConfig = None,
-        passive_reset_time: float = None
+        passive_reset_time: float = None,
     ):
         self.repeats: Optional[int] = repeats
         self.repetition_period: Optional[float] = repetition_period
@@ -235,7 +235,7 @@ class CompilerConfig:
         self.active_calibrations: List[CalibrationArguments] = active_calibrations or []
         self.optimizations: Optional[OptimizationConfig] = optimizations
         self.error_mitigation: Optional[ErrorMitigationConfig] = error_mitigation
-        
+
         if repetition_period:
             warnings.warn(
                 "The `repetition_period` in `CompilerConfig` will soon be deprecated. Please use \
