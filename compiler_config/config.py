@@ -1,5 +1,5 @@
 # SPDX-License-Identifier: BSD-3-Clause
-# Copyright (c) 2023 Oxford Quantum Circuits Ltd
+# Copyright (c) 2023-2025 Oxford Quantum Circuits Ltd
 from __future__ import annotations
 
 import inspect
@@ -224,14 +224,22 @@ class CompilerConfig:
         active_calibrations=None,
         optimizations: "OptimizationConfig" = None,
         error_mitigation: ErrorMitigationConfig = None,
+        passive_reset_time: float = None,
     ):
         self.repeats: Optional[int] = repeats
         self.repetition_period: Optional[float] = repetition_period
+        self.passive_reset_time: Optional[float] = passive_reset_time
         self.results_format: QuantumResultsFormat = results_format or QuantumResultsFormat()
         self.metrics: MetricsType = metrics
         self.active_calibrations: List[CalibrationArguments] = active_calibrations or []
         self.optimizations: Optional[OptimizationConfig] = optimizations
         self.error_mitigation: Optional[ErrorMitigationConfig] = error_mitigation
+
+        if repetition_period:
+            warnings.warn(
+                "The `repetition_period` in `CompilerConfig` will soon be deprecated. Please use \
+                `passive_reset_time` to modify the reset time of qubits to their ground state."
+            )
 
     def to_json(self):
         return json_dumps(self, serializable_types=get_serializable_types())
