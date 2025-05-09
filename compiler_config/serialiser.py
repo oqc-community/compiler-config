@@ -120,7 +120,6 @@ class CustomJSONEncoder(JSONEncoder):
                 raise ValueError(f"Invalid type attempted to be serialized: {(type(obj))}.")
 
         try:
-
             # TODO: Acquire is a special wrapper component, not an actual component. Have a few too many special-cases
             #   for it now, think about reverting its special status.
             if is_dataclass(obj):
