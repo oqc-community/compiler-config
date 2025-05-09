@@ -53,9 +53,8 @@ jobs:
 
       - name: Formatting tests
         run: |
-          poetry run black --check .
-          poetry run isort --check .
-          poetry run autoflake --check .
+          poetry run ruff check
+          poetry run ruff format --check
           poetry run pip-audit --desc
 
 
