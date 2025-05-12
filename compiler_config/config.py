@@ -255,7 +255,6 @@ class CompilerConfig:
         return CompilerConfig().from_json(json)
 
     def validate(self, hardware):
-
         if (
             self.error_mitigation is not None
             and self.error_mitigation != ErrorMitigationConfig.Empty
