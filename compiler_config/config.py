@@ -185,7 +185,7 @@ class MetricsType(Flag):
     # Set of metrics returned for the QAT experimental pipelines.
     Experimental = OptimizedCircuit | OptimizedInstructionCount | PhysicalQubitIndices
 
-    def is_composite(self):
+    def is_composite(self): 
         """
         Any flags that are only composed of other ones should be signaled here. This
         is used for automatic metric generation and whether to build/validate this
