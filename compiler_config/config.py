@@ -176,8 +176,14 @@ class MetricsType(Flag):
     # been performed.
     OptimizedInstructionCount = auto()
 
+    # The physical qubit indices used in the circuit.
+    PhysicalQubitIndices = auto()
+
     # Set of basic metrics that should be returned at all times.
     Default = OptimizedCircuit | OptimizedInstructionCount
+
+    # Set of metrics returned for the QAT experimental pipelines.
+    Experimental = OptimizedCircuit | OptimizedInstructionCount | PhysicalQubitIndices
 
     def is_composite(self):
         """
@@ -185,7 +191,7 @@ class MetricsType(Flag):
         is used for automatic metric generation and whether to build/validate this
         particular value.
         """
-        return self == self.Default or self == self.Empty
+        return self in (self.Default, self.Empty, self.Experimental)
 
     def snake_case_name(self):
         """
