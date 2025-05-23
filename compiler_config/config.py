@@ -175,17 +175,17 @@ class MetricsType(Flag):
     # Count of transformed instructions after all forms of optimizations have
     # been performed.
     OptimizedInstructionCount = auto()
-    
+
     # The physical qubit indices used in the circuit.
     PhysicalQubitIndices = auto()
 
     # Set of basic metrics that should be returned at all times.
     Default = OptimizedCircuit | OptimizedInstructionCount
-    
+
     # Set of metrics returned for the QAT experimental pipelines.
     Experimental = OptimizedCircuit | OptimizedInstructionCount | PhysicalQubitIndices
 
-    def is_composite(self): 
+    def is_composite(self):
         """
         Any flags that are only composed of other ones should be signaled here. This
         is used for automatic metric generation and whether to build/validate this
