@@ -180,7 +180,7 @@ class MetricsType(Flag):
     PhysicalQubitIndices = auto()
 
     # Set of basic metrics that should be returned at all times.
-    Default = OptimizedCircuit | OptimizedInstructionCount
+    Default = OptimizedCircuit | OptimizedInstructionCount | PhysicalQubitIndices
 
     # Set of metrics returned for the QAT experimental pipelines.
     Experimental = OptimizedCircuit | OptimizedInstructionCount | PhysicalQubitIndices
