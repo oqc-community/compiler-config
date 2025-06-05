@@ -233,8 +233,6 @@ class CompilerConfig:
         passive_reset_time: float = None,
     ):
         self.repeats: Optional[int] = repeats
-        self.repetition_period: Optional[float] = repetition_period
-        self.passive_reset_time: Optional[float] = passive_reset_time
         self.results_format: QuantumResultsFormat = results_format or QuantumResultsFormat()
         self.metrics: MetricsType = metrics
         self.active_calibrations: List[CalibrationArguments] = active_calibrations or []
@@ -246,6 +244,16 @@ class CompilerConfig:
                 "The `repetition_period` in `CompilerConfig` will soon be deprecated. Please use \
                 `passive_reset_time` to modify the reset time of qubits to their ground state."
             )
+            
+        if repetition_period and passive_reset_time:
+            warnings.warn(
+                "Both `repetition_period` and `passive_reset_time` are set in `CompilerConfig`. \
+                Please only use `passive_reset_time` to modify the reset time of qubits to their ground state."
+            )
+            
+        # TODO: Remove repetition_period in future version COMPILER-428
+        self.repetition_period: Optional[float] = repetition_period
+        self.passive_reset_time: Optional[float] = passive_reset_time
 
     def to_json(self):
         return json_dumps(self, serializable_types=get_serializable_types())
