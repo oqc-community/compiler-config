@@ -243,8 +243,8 @@ class CompilerConfig:
 
         if repetition_period:
             warnings.warn(
-                "The `repetition_period` in `CompilerConfig` will soon be deprecated. Please use \
-                `passive_reset_time` to modify the reset time of qubits to their ground state."
+                "The `repetition_period` in `CompilerConfig` will soon be deprecated. "
+                "Please use `passive_reset_time` to modify the reset time of qubits to their ground state."
             )
 
     def to_json(self):
