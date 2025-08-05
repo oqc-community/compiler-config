@@ -226,7 +226,7 @@ class CompilerConfig:
         repeats=None,
         repetition_period=None,
         results_format: QuantumResultsFormat = None,
-        metrics=MetricsType.Default,
+        metrics=MetricsType.Experimental,
         active_calibrations=None,
         optimizations: "OptimizationConfig" = None,
         error_mitigation: ErrorMitigationConfig = None,
