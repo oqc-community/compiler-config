@@ -10,7 +10,7 @@ jobs:
       branch: ${{ steps.check_step.outputs.branch }}
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
         with:
           fetch-depth: 0
       - name: Get current branch
@@ -31,7 +31,7 @@ jobs:
     # only run if tag is present on branch 'main'
     if: contains(${{ needs.check-current-branch.outputs.branch }}, 'main')`
     steps:
-    - uses: actions/checkout@v4
+    - uses: actions/checkout@v5
 
     - name: Install Poetry
       uses: snok/install-poetry@v1
