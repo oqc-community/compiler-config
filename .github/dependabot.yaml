@@ -12,7 +12,7 @@ updates:
     registries: "*"
     directory: "/"
     insecure-external-code-execution: allow
-    versioning-strategy: increase-if-necessary
+    versioning-strategy: lockfile-only
     schedule:
       interval: "daily"
     groups:
@@ -24,6 +24,3 @@ updates:
         applies-to: version-updates
         patterns:
           - "*"
-        update-types:
-          - "minor"
-          - "patch"
