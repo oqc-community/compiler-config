@@ -22,7 +22,7 @@ requires-poetry = ">=2.0"
 packages = [
     { include = "compiler_config" }
 ]
-
+version = "0.0.0"
 
 [tool.poetry.dependencies]
 python = ">=3.9,<3.13"
@@ -33,6 +33,27 @@ ruff = "^0.11.7"
 pip-audit = "^2.9.0"
 pre-commit = "^3.2.0"
 
+[tool.poetry.requires-plugins]
+poetry-dynamic-versioning = { version = ">=1.0.0,<2.0.0", extras = ["plugin"] }
+
+[tool.poetry-dynamic-versioning]
+enable = true
+pattern = "default-unprefixed"
+vcs = "git"
+metadata = false
+dirty = false
+style = "pep440"
+format-jinja = """
+    {%- if distance == 0 -%}
+        {{ serialize_pep440(base) }}
+    {%- else -%}
+        {{ serialize_pep440(base, post=distance, dev=timestamp) }}
+    {%- endif -%}
+"""
+
+[build-system]
+requires = ["poetry-core>=2.0.0", "poetry-dynamic-versioning>=1.0.0,<2.0.0"]
+build-backend = "poetry_dynamic_versioning.backend"
 
 [tool.ruff]
 line-length = 92
@@ -47,12 +68,3 @@ extend-select = ["I"]
 [tool.ruff.lint.isort]
 known-first-party = ["compiler_config"]
 known-local-folder = ["tests"]
-
-
-[tool.poetry.scripts]
-format-code = "poetry_scripts:format_code"
-
-
-[build-system]
-requires = ["poetry-core"]
-build-backend = "poetry.core.masonry.api"
