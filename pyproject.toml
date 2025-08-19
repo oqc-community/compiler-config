@@ -1,10 +1,24 @@
-[tool.poetry]
+[project]
 name = "compiler-config"
-version = "0.1.1"
-description = ""
-authors = ["jamie <jfriel@oxfordquantumcircuits.com>"]
 readme = "README.md"
+license = "BSD-3-Clause"
+requires-python = ">=3.9"
+dynamic = ["version"]
+authors = [
+    { name = "Jamie Friel", email = "jfriel@oxfordquantumcircuits.com" }
+]
+dependencies = []
 
+[project.urls]
+repository = "https://github.com/oqc-community/qat"
+documentation = "https://oqc-community.github.io/qat"
+homepage = "https://oqc.tech/"
+
+[project.scripts]
+format-code = "poetry_scripts:format_code"
+
+[tool.poetry]
+requires-poetry = ">=2.0"
 packages = [
     { include = "compiler_config" }
 ]
@@ -12,7 +26,6 @@ packages = [
 
 [tool.poetry.dependencies]
 python = ">=3.9,<3.13"
-
 
 [tool.poetry.group.dev.dependencies]
 pytest = "~8.3.5"
