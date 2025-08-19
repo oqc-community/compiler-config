@@ -1,0 +1,13 @@
+name: PR workflow
+
+on:
+  pull_request:
+    branches: [main]
+
+concurrency:
+  group: ${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  tests:
+    uses: ./.github/workflows/package-tests.yml
