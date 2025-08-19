@@ -1,66 +1,133 @@
 name: Publish package to PyPI and TestPyPI
 
 on:
-  push:
-    tags: [ '[0-9]+.[0-9]+.[0-9]+' ]
+  workflow_dispatch:
+    inputs:
+      bump:
+        description: "The type of version bump to apply"
+        required: true
+        default: "patch"
+        type: choice
+        options:
+          - "patch"
+          - "minor"
+          - "major"
+
+env:
+  PYTHON_VERSION: "3.10"
+
 jobs:
-  check-current-branch:
+  final-tests: 
+    name: Final tests
+    uses: ./.github/workflows/package-tests.yml
+
+  release:
     runs-on: ubuntu-22.04
-    outputs:
-      branch: ${{ steps.check_step.outputs.branch }}
+    needs: final-tests
     steps:
       - name: Checkout
         uses: actions/checkout@v5
         with:
           fetch-depth: 0
-      - name: Get current branch
-        id: check_step
-        # 1. Get the list of branches ref where this tag exists
-        # 2. Remove 'origin/' from that result
-        # 3. Put that string in output
-        # => We can now use function 'contains(list, item)''
+
+      - name: Install Poetry
+        uses: snok/install-poetry@v1
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+          cache: 'poetry'
+
+      - name: Install dependencies
+        run: poetry sync
+
+      - name: Generate tag
+        id: tag
+        shell: bash
         run: |
-          raw=$(git branch -r --contains ${{ github.ref }})
-          branch="$(echo ${raw//origin\//} | tr -d '\n')"
-          echo "{name}=branch" >> $GITHUB_OUTPUT
-          echo "Branches where this tag exists : $branch."          
-  build:
-    name: Build
+          BUMP_TYPE=${{ inputs.bump }}
+          LATEST_TAG=$(git tag --list --sort=-v:refname | grep -E '^[0-9]+\.[0-9]+\.[0-9]+$' | head -n1)
+          IFS='.' read -r MAJOR MINOR PATCH <<< "$LATEST_TAG"
+          case "$BUMP_TYPE" in
+            major)
+              MAJOR=$((MAJOR + 1))
+              MINOR=0
+              PATCH=0
+              ;;
+            minor)
+              MINOR=$((MINOR + 1))
+              PATCH=0
+              ;;
+            patch)
+              PATCH=$((PATCH + 1))
+              ;;
+          esac
+          NEW_TAG="$MAJOR.$MINOR.$PATCH"
+          echo "$NEW_TAG"
+          echo "tag=$NEW_TAG" >> $GITHUB_OUTPUT
+
+      - name: Check tag validity
+        if: always()
+        shell: bash
+        run: |
+          if [[ ! "${{ steps.tag.outputs.tag }}" =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
+            echo "❌ Tag is invalid. Aborting release."
+            exit 1
+          fi
+
+      - name: Tag release
+        run: |
+          git tag ${{ steps.tag.outputs.tag }}
+
+      - name: Check poetry version matches tag
+        run: | 
+          POETRY_VERSION=$(poetry version -s)
+          [[ $POETRY_VERSION = ${{ steps.tag.outputs.tag }} ]] || {
+            echo "❌ Poetry version does not match tag. Aborting release."
+            exit 1
+          }
+
+      - name: Poetry build
+        run: poetry build
+
+      - name: Store the distribution packages
+        uses: actions/upload-artifact@v4
+        with:
+          name: python-package-distributions
+          path: dist/
+
+  publish-to-testpypi:
+    name: Publish to TestPyPI
     runs-on: ubuntu-22.04
-    needs: check-current-branch
-    # only run if tag is present on branch 'main'
-    if: contains(${{ needs.check-current-branch.outputs.branch }}, 'main')`
+    environment: test-pypi
+    permissions:
+      id-token: write
+    needs: release
+    env:
+      name: testpypi
+      url: https://test.pypi.org/p/qat-config
+    
     steps:
-    - uses: actions/checkout@v5
+      - name: Download all the dists
+        uses: actions/download-artifact@v5
+        with:
+          name: python-package-distributions
+          path: dist/
 
-    - name: Install Poetry
-      uses: snok/install-poetry@v1
-
-    - name: Set up Python
-      uses: actions/setup-python@v5
-      with:
-        python-version: "3.x"
-    - name: Check poetry version matches tag
-      run: | 
-        POETRY_VERSION=$(poetry version -s)
-        TAG=$(echo $GITHUB_REF | cut -d / -f 3)
-        [ $POETRY_VERSION = $TAG ] 
-    - name: Poetry install
-      run: poetry install --sync
-
-    - name: Poetry build
-      run: poetry build
-
-    - name: Store the distribution packages
-      uses: actions/upload-artifact@v4
-      with:
-        name: python-package-distributions
-        path: dist/
+      - name: Publish distribution 📦 to TestPyPI
+        uses: pypa/gh-action-pypi-publish@release/v1
+        with:
+          repository-url: https://test.pypi.org/legacy/
+          verbose: true
+          skip-existing: true
 
   publish-to-pypi:
     name: Publish to PyPI
     needs:
-    - build
+    - release
+    - publish-to-testpypi
+    environment: pypi
     runs-on: ubuntu-22.04
     env:
       name: pypi
@@ -74,35 +141,19 @@ jobs:
       with:
         name: python-package-distributions
         path: dist/
+
     - name: Publish distribution 📦 to PyPI
       uses: pypa/gh-action-pypi-publish@release/v1
-    - name: Install Poetry
-      uses: snok/install-poetry@v1
-
-  github-release:
-    name: >-
-      Sign the Python distribution
-      and upload them to GitHub Release
-    needs:
-    - publish-to-pypi
-    runs-on: ubuntu-22.04
-
-    permissions:
-      contents: write  # IMPORTANT: mandatory for making GitHub Releases
-      id-token: write  # IMPORTANT: mandatory for sigstore
-
-    steps:
-    - name: Download all the dists
-      uses: actions/download-artifact@v5
       with:
-        name: python-package-distributions
-        path: dist/
+        verbose: true
+
     - name: Sign the dists with Sigstore
       uses: sigstore/gh-action-sigstore-python@v3.0.1
       with:
         inputs: >-
           ./dist/*.tar.gz
           ./dist/*.whl
+
     - name: Create GitHub Release
       env:
         GITHUB_TOKEN: ${{ github.token }}
@@ -113,6 +164,7 @@ jobs:
         --generate-notes
         --title "${{ github.ref_name }}"
         --latest
+        
     - name: Upload artifact signatures to GitHub Release
       env:
         GITHUB_TOKEN: ${{ github.token }}
@@ -123,29 +175,3 @@ jobs:
         gh release upload
         '${{ github.ref_name }}' dist/**
         --repo '${{ github.repository }}'
-    - name: Install Poetry
-      uses: snok/install-poetry@v1
-
-  publish-to-testpypi:
-    name: Publish to TestPyPI
-    needs:
-    - build
-    runs-on: ubuntu-22.04
-
-    env:
-      name: testpypi
-      url: https://test.pypi.org/p/qat-config
-
-    permissions:
-      id-token: write
-
-    steps:
-    - name: Download all the dists
-      uses: actions/download-artifact@v5
-      with:
-        name: python-package-distributions
-        path: dist/
-    - name: Publish distribution 📦 to TestPyPI
-      uses: pypa/gh-action-pypi-publish@release/v1
-      with:
-        repository-url: https://test.pypi.org/legacy/
