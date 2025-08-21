@@ -136,6 +136,7 @@ jobs:
       url: https://pypi.org/p/qat-config  # Replace <package-name> with your PyPI project name
     permissions:
       id-token: write
+      contents: write
 
     steps:
     - name: Download all the dists
