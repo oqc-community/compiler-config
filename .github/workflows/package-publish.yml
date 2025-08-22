@@ -136,6 +136,7 @@ jobs:
       url: https://pypi.org/p/qat-config  # Replace <package-name> with your PyPI project name
     permissions:
       id-token: write
+      contents: write
 
     steps:
     - name: Download all the dists
@@ -148,6 +149,7 @@ jobs:
       uses: pypa/gh-action-pypi-publish@release/v1
       with:
         verbose: true
+        skip-existing: true
 
     - name: Sign the dists with Sigstore
       uses: sigstore/gh-action-sigstore-python@v3.0.1
