@@ -4,6 +4,8 @@ updates:
     directory: "/"
     schedule:
       interval: "daily"
+    labels:
+      - ignore-for-release
     groups:
       github-actions:
         patterns:
@@ -15,6 +17,8 @@ updates:
     versioning-strategy: lockfile-only
     schedule:
       interval: "daily"
+    labels:
+      - ignore-for-release
     groups:
       security-updates:
         applies-to: security-updates
