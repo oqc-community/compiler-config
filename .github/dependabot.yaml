@@ -5,7 +5,7 @@ updates:
     schedule:
       interval: "daily"
     labels:
-      - ignore-on-release
+      - ignore-for-release
     groups:
       github-actions:
         patterns:
@@ -18,7 +18,7 @@ updates:
     schedule:
       interval: "daily"
     labels:
-      - ignore-on-release
+      - ignore-for-release
     groups:
       security-updates:
         applies-to: security-updates
