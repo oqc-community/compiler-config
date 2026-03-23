@@ -27,6 +27,6 @@ def get_contents(file_path):
 # Parameterized fixture for each JSON template file in the templates directory. In other words, any test that
 # uses this fixture is tested on all files in the list.
 @pytest.fixture(params=template_dir.glob("*.json"))
-def json_template(request):
+def json_template_path(request):
     """Yields the name of each JSON template file in the templates directory."""
     return request.param

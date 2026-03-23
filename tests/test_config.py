@@ -1,6 +1,6 @@
 # SPDX-License-Identifier: BSD-3-Clause
 # Copyright (c) 2023 Oxford Quantum Circuits Ltd
-
+from pathlib import Path
 from sys import __loader__
 
 import pytest
@@ -60,11 +60,13 @@ def test_specific_config_optimizations():
 @pytest.mark.parametrize(
     "pre_select, post_select", [(True, True), (True, False), (False, True), (False, False)]
 )
-def test_pre_post_selection_serialisation(pre_select, post_select):
+def test_pre_post_selection_serialisation(pre_select: bool, post_select: bool):
     """
     Test that the pre_selection and post_selection fields are correctly serialised and deserialised
     in the CompilerConfig object. Ensures that both True and False values for these fields are
     preserved through the serialisation-deserialisation process.
+    :param pre_select:  Boolean value for the pre_selection field to test.
+    :param post_select:  Boolean value for the post_selection field to test.
     """
     local_config = CompilerConfig(pre_selection=pre_select, post_selection=post_select)
     serialized_data = local_config.to_json()
@@ -76,12 +78,13 @@ def test_pre_post_selection_serialisation(pre_select, post_select):
     assert decode_config.post_selection == post_select
 
 
-def test_pre_post_selection_backwards_compatibility(json_template):
+def test_pre_post_selection_backwards_compatibility(json_template_path: Path):
     """
     Tests that all legacy files are readable and that the defaults for pre and post selection are correctly
     qpplied.
+    :param json_template: Fixture that provides the path to each JSON template file in the templates directory.
     """
-    config = CompilerConfig.create_from_json(get_contents(json_template))
+    config = CompilerConfig.create_from_json(get_contents(json_template_path))
     assert config.pre_selection is False
     assert config.post_selection is False
 
