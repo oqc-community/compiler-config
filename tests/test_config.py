@@ -76,6 +76,12 @@ def test_pre_post_selection_serialisation(pre_select, post_select):
     assert decode_config.post_selection == post_select
 
 
+def test_pre_post_selection_backwards_compatibility(json_template):
+    config = CompilerConfig.create_from_json(get_contents(json_template))
+    assert config.pre_selection is False
+    assert config.post_selection is False
+
+
 def test_all_config_optimizations():
     def get_subclasses(object):
         subclasses = []
