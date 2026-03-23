@@ -77,6 +77,10 @@ def test_pre_post_selection_serialisation(pre_select, post_select):
 
 
 def test_pre_post_selection_backwards_compatibility(json_template):
+    """
+    Tests that all legacy files are readable and that the defaults for pre and post selection are correctly
+    qpplied.
+    """
     config = CompilerConfig.create_from_json(get_contents(json_template))
     assert config.pre_selection is False
     assert config.post_selection is False
