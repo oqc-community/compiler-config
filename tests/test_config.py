@@ -56,7 +56,10 @@ def test_specific_config_optimizations():
         == second_conf.optimizations.qiskit_optimizations
     )
 
-@pytest.mark.parametrize("pre_select, post_select", [(True, True), (True, False), (False, True), (False, False)])
+
+@pytest.mark.parametrize(
+    "pre_select, post_select", [(True, True), (True, False), (False, True), (False, False)]
+)
 def test_pre_post_selection_serialisation(pre_select, post_select):
     """
     Test that the pre_selection and post_selection fields are correctly serialised and deserialised
@@ -65,8 +68,8 @@ def test_pre_post_selection_serialisation(pre_select, post_select):
     """
     local_config = CompilerConfig(pre_selection=pre_select, post_selection=post_select)
     serialized_data = local_config.to_json()
-    assert f'"pre_selection":' in serialized_data
-    assert f'"post_selection":' in serialized_data
+    assert '"pre_selection":' in serialized_data
+    assert '"post_selection":' in serialized_data
 
     decode_config = CompilerConfig.create_from_json(serialized_data)
     assert decode_config.pre_selection == pre_select

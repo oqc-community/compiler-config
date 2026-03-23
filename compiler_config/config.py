@@ -231,7 +231,7 @@ class CompilerConfig:
         optimizations: "OptimizationConfig" = None,
         error_mitigation: ErrorMitigationConfig = None,
         passive_reset_time: float = None,
-        post_selection:bool = False,
+        post_selection: bool = False,
         pre_selection: bool = False,
     ):
         self.repeats: Optional[int] = repeats
