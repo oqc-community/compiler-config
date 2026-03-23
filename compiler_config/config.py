@@ -231,6 +231,8 @@ class CompilerConfig:
         optimizations: "OptimizationConfig" = None,
         error_mitigation: ErrorMitigationConfig = None,
         passive_reset_time: float = None,
+        post_selection:bool = False,
+        pre_selection: bool = False,
     ):
         self.repeats: Optional[int] = repeats
         self.repetition_period: Optional[float] = repetition_period
@@ -240,6 +242,8 @@ class CompilerConfig:
         self.active_calibrations: List[CalibrationArguments] = active_calibrations or []
         self.optimizations: Optional[OptimizationConfig] = optimizations
         self.error_mitigation: Optional[ErrorMitigationConfig] = error_mitigation
+        self.pre_selection: bool = pre_selection
+        self.post_selection: bool = post_selection
 
         if repetition_period:
             warnings.warn(
