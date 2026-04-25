@@ -89,6 +89,40 @@ def test_pre_post_selection_backwards_compatibility(json_template_path: Path):
     assert config.post_selection is False
 
 
+def test_driven_reset_defaults_false():
+    """
+    We want to explicitly enable driven reset. As a new feature, we do not want to
+    introduce it implicitly into the default configuration.
+    """
+    config = CompilerConfig()
+    assert not config.driven_reset
+
+
+@pytest.mark.parametrize("driven_reset_flag", [True, False])
+def test_driven_reset_serialisation_deserialisation_rounttrip(driven_reset_flag):
+    config = CompilerConfig(driven_reset=driven_reset_flag)
+    assert config.driven_reset == driven_reset_flag
+    serialized_data = config.to_json()
+    decode_config = CompilerConfig.create_from_json(serialized_data)
+    assert decode_config.driven_reset == driven_reset_flag
+
+
+def test_warning_on_driven_reset_when_passive_time_added():
+    with pytest.warns():
+        CompilerConfig(driven_reset=True, passive_reset_time=10.0)
+
+
+def test_driven_reset_backwards_compatibility(json_template_path: Path):
+    """
+    Tests that all legacy files are readable and that the defaults for driven reset are
+    correctly qpplied.
+    :param json_template: Fixture that provides the path to each JSON template file
+    in the templates directory.
+    """
+    config = CompilerConfig.create_from_json(get_contents(json_template_path))
+    assert config.driven_reset is False
+
+
 def test_all_config_optimizations():
     def get_subclasses(object):
         subclasses = []

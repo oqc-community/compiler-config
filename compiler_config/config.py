@@ -233,6 +233,7 @@ class CompilerConfig:
         passive_reset_time: float = None,
         post_selection: bool = False,
         pre_selection: bool = False,
+        driven_reset: bool = False,
     ):
         self.repeats: Optional[int] = repeats
         self.repetition_period: Optional[float] = repetition_period
@@ -244,11 +245,18 @@ class CompilerConfig:
         self.error_mitigation: Optional[ErrorMitigationConfig] = error_mitigation
         self.pre_selection: bool = pre_selection
         self.post_selection: bool = post_selection
+        self.driven_reset: bool = driven_reset
 
         if repetition_period:
             warnings.warn(
                 "The `repetition_period` in `CompilerConfig` will soon be deprecated. "
-                "Please use `passive_reset_time` to modify the reset time of qubits to their ground state."
+                "Please use `passive_reset_time` to modify the reset time of qubits "
+                "to their ground state."
+            )
+        if driven_reset and passive_reset_time is not None:
+            warnings.warn(
+                "You have set both `driven_reset` and `passive_reset_time` "
+                "set. Passive reset settings will be ignored."
             )
 
     def to_json(self):
