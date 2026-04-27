@@ -37,7 +37,7 @@ jobs:
         run: |
           poetry run ruff check
           poetry run ruff format --check
-          poetry run pip-audit --desc --ignore-vuln CVE-2026-4539 --ignore-vuln CVE-2026-3219
+          poetry run pip-audit --desc --ignore-vuln CVE-2026-3219 
           
 
 
