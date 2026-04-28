@@ -18,7 +18,7 @@ jobs:
 
   build:
     name: Build package
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-24.04
     needs: final-tests
     outputs:
       tag: ${{ steps.tag.outputs.tag }}
@@ -92,7 +92,7 @@ jobs:
 
   publish-to-testpypi:
     name: Publish to TestPyPI
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-24.04
     environment: test-pypi
     permissions:
       id-token: write
@@ -121,7 +121,7 @@ jobs:
     - build
     - publish-to-testpypi
     environment: pypi
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-24.04
     env:
       name: pypi
       url: https://pypi.org/p/qat-config  # Replace <package-name> with your PyPI project name
