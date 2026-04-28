@@ -3,15 +3,10 @@ name: Publish package to PyPI and TestPyPI
 on:
   workflow_dispatch:
     inputs:
-      bump:
-        description: "The type of version bump to apply"
+      version:
+        description: 'The version of the project eg 1.2.3'
+        type: string
         required: true
-        default: "patch"
-        type: choice
-        options:
-          - "patch"
-          - "minor"
-          - "major"
 
 env:
   PYTHON_VERSION: "3.10"
@@ -21,74 +16,70 @@ jobs:
     name: Final tests
     uses: ./.github/workflows/package-tests.yml
 
-  release:
+  build:
+    name: Build package
     runs-on: ubuntu-22.04
     needs: final-tests
     outputs:
       tag: ${{ steps.tag.outputs.tag }}
     steps:
+
       - name: Checkout
         uses: actions/checkout@v6
         with:
           fetch-depth: 0
 
-      - name: Install Poetry
-        uses: snok/install-poetry@v1
+      - name: Install Poetry and Dynamic Versioning plugin
+        run: |
+          pipx install poetry
+          pipx inject poetry "poetry-dynamic-versioning[plugin]"
 
       - name: Set up Python
         uses: actions/setup-python@v6
         with:
           python-version: ${{ env.PYTHON_VERSION }}
-          cache: 'poetry'
 
-      - name: Install dependencies
-        run: poetry sync
+      - name: Install packaging
+        run: |
+          pip install packaging
+
+      - name: Get current version
+        id: current
+        run: |
+          echo "version=$(poetry version -s)" >> "$GITHUB_OUTPUT"
+
+      - name: Validate version
+        id: validate-tag
+        env:
+          NEW_VERSION: ${{ inputs.version }}
+          CURRENT_VERSION: ${{ steps.current.outputs.version }}
+        shell: python
+        run: |
+          from packaging.version import Version, InvalidVersion
+          import sys
+          import os
+
+          new_version = os.getenv("NEW_VERSION")
+          current_version = os.getenv("CURRENT_VERSION")
+
+          try:
+              Version(new_version)
+          except InvalidVersion:
+              print(f"Error: '{new_version}' is not a valid version.")
+              sys.exit(1)
+
+          if Version(new_version) <= Version(current_version):
+              print(f"Error: New version '{new_version}' must be greater than current version '{current_version}'.")
+              sys.exit(1)
 
       - name: Generate tag
         id: tag
         shell: bash
+        env:
+          VERSION: ${{ inputs.version }}
         run: |
-          BUMP_TYPE=${{ inputs.bump }}
-          LATEST_TAG=$(git tag --list --sort=-v:refname | grep -E '^[0-9]+\.[0-9]+\.[0-9]+$' | head -n1)
-          IFS='.' read -r MAJOR MINOR PATCH <<< "$LATEST_TAG"
-          case "$BUMP_TYPE" in
-            major)
-              MAJOR=$((MAJOR + 1))
-              MINOR=0
-              PATCH=0
-              ;;
-            minor)
-              MINOR=$((MINOR + 1))
-              PATCH=0
-              ;;
-            patch)
-              PATCH=$((PATCH + 1))
-              ;;
-          esac
-          NEW_TAG="$MAJOR.$MINOR.$PATCH"
-          echo "$NEW_TAG"
-          echo "tag=$NEW_TAG" >> $GITHUB_OUTPUT
-
-      - name: Check tag validity
-        if: always()
-        shell: bash
-        run: |
-          if [[ ! "${{ steps.tag.outputs.tag }}" =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
-            echo "❌ Tag is invalid. Aborting release."
-            exit 1
-          fi
-
-      - name: Tag release
-        run: |
-          git tag ${{ steps.tag.outputs.tag }}
-
-      - name: Check poetry version matches tag
-        run: | 
-          POETRY_VERSION=$(poetry version -s)
-          [[ $POETRY_VERSION = ${{ steps.tag.outputs.tag }} ]] || {
-            echo "❌ Poetry version does not match tag. Aborting release."
-            exit 1
-          }
+          git tag -a "$VERSION" -m "Release $VERSION"
+          echo "tag=$VERSION" >> "$GITHUB_OUTPUT"
 
       - name: Poetry build
         run: poetry build
@@ -105,7 +96,7 @@ jobs:
     environment: test-pypi
     permissions:
       id-token: write
-    needs: release
+    needs: build
     env:
       name: testpypi
       url: https://test.pypi.org/p/qat-config
@@ -127,7 +118,7 @@ jobs:
   publish-to-pypi:
     name: Publish to PyPI
     needs:
-    - release
+    - build
     - publish-to-testpypi
     environment: pypi
     runs-on: ubuntu-22.04
@@ -163,10 +154,10 @@ jobs:
         GITHUB_TOKEN: ${{ github.token }}
       run: >-
         gh release create
-        '${{ needs.release.outputs.tag }}'
+        '${{ needs.build.outputs.tag }}'
         --repo '${{ github.repository }}'
         --generate-notes
-        --title "${{ needs.release.outputs.tag }}"
+        --title "${{ needs.build.outputs.tag }}"
         --latest
         
     - name: Upload artifact signatures to GitHub Release
@@ -177,5 +168,5 @@ jobs:
       # sigstore-produced signatures and certificates.
       run: >-
         gh release upload
-        '${{ needs.release.outputs.tag }}' dist/**
+        '${{ needs.build.outputs.tag }}' dist/**
         --repo '${{ github.repository }}'
