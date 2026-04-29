@@ -78,7 +78,7 @@ jobs:
         env:
           VERSION: ${{ inputs.version }}
         run: |
-          git tag -a "$VERSION" -m "Release $VERSION"
+          git tag "$VERSION"
           echo "tag=$VERSION" >> "$GITHUB_OUTPUT"
 
       - name: Poetry build
