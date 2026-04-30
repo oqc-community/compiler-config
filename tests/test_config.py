@@ -244,8 +244,8 @@ def test_json_version_compatibility_golb_ph_x():
     serialised_data = get_contents(
         "serialised_full_compiler_config_v02_with_golbalise_phased_x.json"
     )
-    # with pytest.warns(UserWarning, match="Ignoring unknown legacy flag bits"):
-    deserialised_conf = CompilerConfig.create_from_json(serialised_data)
+    with pytest.warns(UserWarning, match="Ignoring unknown legacy flag bits"):
+        deserialised_conf = CompilerConfig.create_from_json(serialised_data)
     assert deserialised_conf.repeats == 1000
     assert deserialised_conf.repetition_period == 10
     assert deserialised_conf.metrics == MetricsType.OptimizedInstructionCount
@@ -255,10 +255,7 @@ def test_json_version_compatibility_golb_ph_x():
         == ResultsFormatting.DynamicStructureReturn
     )
     assert deserialised_conf.optimizations.qiskit_optimizations == QiskitOptimizations.Empty
-    assert (
-        deserialised_conf.optimizations.tket_optimizations
-        == TketOptimizations.One | TketOptimizations.GlobalisePhasedX
-    )
+    assert deserialised_conf.optimizations.tket_optimizations == TketOptimizations.One
 
 
 @pytest.mark.parametrize(
@@ -271,7 +268,6 @@ def test_json_version_compatibility_golb_ph_x():
         (TketOptimizations.DirectionalCXGates, 16),
         (TketOptimizations.CliffordSimp, 32),
         (TketOptimizations.DecomposeArbitrarilyControlledGates, 64),
-        (TketOptimizations.GlobalisePhasedX, 128),
         (TketOptimizations.KAKDecomposition, 256),
         (TketOptimizations.PeepholeOptimise2Q, 512),
         (TketOptimizations.RemoveDiscarded, 1024),
