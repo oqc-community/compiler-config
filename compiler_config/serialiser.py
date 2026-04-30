@@ -3,8 +3,9 @@
 import json
 import re
 import sys
+import warnings
 from dataclasses import asdict, is_dataclass
-from enum import Enum
+from enum import Enum, Flag
 from importlib import import_module
 from json import JSONDecoder, JSONEncoder
 
@@ -63,7 +64,30 @@ class CustomJsonDecoder(JSONDecoder):
             typ = _get_type(obj_type)
 
         if issubclass(typ, Enum):
-            return typ(obj["$value"])
+            enum_value = obj["$value"]
+            if issubclass(typ, Flag) and isinstance(enum_value, int):
+                try:
+                    return typ(enum_value)
+                except ValueError:
+                    known_mask = 0
+                    for member in typ.__members__.values():
+                        if isinstance(member.value, int):
+                            known_mask |= member.value
+
+                    unknown_bits = enum_value & ~known_mask
+                    filtered_value = enum_value & known_mask
+
+                    if unknown_bits:
+                        warnings.warn(
+                            f"Ignoring unknown legacy flag bits {unknown_bits} while "
+                            f"deserializing {typ.__module__}.{typ.__name__}.",
+                            UserWarning,
+                            stacklevel=3,
+                        )
+
+                    return typ(filtered_value)
+
+            return typ(enum_value)
 
         if "$data" in obj:
             data = obj["$data"]

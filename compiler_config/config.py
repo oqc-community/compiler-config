@@ -139,7 +139,7 @@ class TketOptimizations(Flag):
     # EulerAngleReduction = auto()
     GlobalisePhasedX = auto()
     # GuidedPauliSimp = auto()
-    KAKDecomposition = auto()
+    KAKDecomposition = 256
     # OptimisePhaseGadgets = auto()
     # PauliSimp = auto()
     # PauliSquash = auto()
