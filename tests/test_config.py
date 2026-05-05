@@ -240,9 +240,9 @@ def test_json_version_compatibility_full(version):
     assert deserialised_conf.optimizations.tket_optimizations == TketOptimizations.One
 
 
-def test_json_version_compatibility_golb_ph_x():
+def test_json_version_compatibility_glob_ph_x():
     serialised_data = get_contents(
-        "serialised_full_compiler_config_v02_with_golbalise_phased_x.json"
+        "serialised_full_compiler_config_v02_with_globalise_phased_x.json"
     )
     with pytest.warns(UserWarning, match="Ignoring unknown legacy flag bits"):
         deserialised_conf = CompilerConfig.create_from_json(serialised_data)
