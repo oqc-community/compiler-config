@@ -240,12 +240,48 @@ def test_json_version_compatibility_full(version):
     assert deserialised_conf.optimizations.tket_optimizations == TketOptimizations.One
 
 
-@pytest.mark.parametrize("flag", [to for to in TketOptimizations])
-def test_tket_flags(flag):
-    tket = None
-    if flag == TketOptimizations.GlobalisePhasedX:
-        with pytest.warns(DeprecationWarning):
-            tket = Tket(tket_optimization=flag)
-    else:
-        tket = Tket(tket_optimization=flag)
+def test_json_version_compatibility_glob_ph_x():
+    serialised_data = get_contents(
+        "serialised_full_compiler_config_v02_with_globalise_phased_x.json"
+    )
+    with pytest.warns(UserWarning, match="Ignoring unknown legacy flag bits"):
+        deserialised_conf = CompilerConfig.create_from_json(serialised_data)
+    assert deserialised_conf.repeats == 1000
+    assert deserialised_conf.repetition_period == 10
+    assert deserialised_conf.metrics == MetricsType.OptimizedInstructionCount
+    assert deserialised_conf.results_format.format == InlineResultsProcessing.Binary
+    assert (
+        deserialised_conf.results_format.transforms
+        == ResultsFormatting.DynamicStructureReturn
+    )
+    assert deserialised_conf.optimizations.qiskit_optimizations == QiskitOptimizations.Empty
+    assert deserialised_conf.optimizations.tket_optimizations == TketOptimizations.One
+
+
+@pytest.mark.parametrize(
+    "data",
+    [
+        (TketOptimizations.Empty, 1),
+        (TketOptimizations.DefaultMappingPass, 2),
+        (TketOptimizations.FullPeepholeOptimise, 4),
+        (TketOptimizations.ContextSimp, 8),
+        (TketOptimizations.DirectionalCXGates, 16),
+        (TketOptimizations.CliffordSimp, 32),
+        (TketOptimizations.DecomposeArbitrarilyControlledGates, 64),
+        (TketOptimizations.KAKDecomposition, 256),
+        (TketOptimizations.PeepholeOptimise2Q, 512),
+        (TketOptimizations.RemoveDiscarded, 1024),
+        (TketOptimizations.RemoveBarriers, 2048),
+        (TketOptimizations.RemoveRedundancies, 4096),
+        (TketOptimizations.ThreeQubitSquash, 8192),
+        (TketOptimizations.SimplifyMeasured, 16384),
+        (TketOptimizations.One, 2 + 16),
+        (TketOptimizations.Two, 2 + 16 + 4 + 8),
+    ],
+    ids=lambda x: x[0],
+)
+def test_tket_flags(data):
+    flag, value = data
+    tket = Tket(tket_optimization=flag)
     assert flag in tket
+    assert flag.value == value
