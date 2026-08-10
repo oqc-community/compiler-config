@@ -5,7 +5,6 @@ import pytest
 from compiler_config.experimental.erado.config import (
     EradoConfig,
     ErasureModel,
-    IdleGate,
     IdlingErrorConfig,
 )
 
@@ -32,7 +31,7 @@ def test_full_config_round_trip():
         get_fidelities=True,
         idling_error=IdlingErrorConfig(
             max_idle_length=8,
-            idle_gate=IdleGate.PAULI_Z,
+            idle_gate="z",
             circuit_gate_time=2.0,
             idle_gate_time=0.5,
             sequence_min_length_ratio=0.75,
@@ -45,7 +44,7 @@ def test_full_config_round_trip():
     assert deserialised_config == config
     assert type(deserialised_config.erasure_model) is ErasureModel
     assert type(deserialised_config.idling_error) is IdlingErrorConfig
-    assert type(deserialised_config.idling_error.idle_gate) is IdleGate
+    assert deserialised_config.idling_error.idle_gate == "z"
     assert '"results_format"' not in serialised_config
 
 

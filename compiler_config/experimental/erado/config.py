@@ -23,24 +23,12 @@ class ErasureModel(Enum):
     TRANSPILER_PASS = "transpiler_pass"
 
 
-class IdleGate(IntEnum):
-    """Gate inserted by Erado when padding idle periods.
-
-    The supported choices are the identity gate and the Pauli X, Y and Z gates.
-    """
-
-    IDENTITY = auto()
-    PAULI_X = auto()
-    PAULI_Y = auto()
-    PAULI_Z = auto()
-
-
 @dataclass
 class IdlingErrorConfig:
     """Settings passed to Erado's idle-period padding operation."""
 
     max_idle_length: int = 14
-    idle_gate: IdleGate = IdleGate.IDENTITY
+    idle_gate: str = "id"
     circuit_gate_time: float = 1.0
     idle_gate_time: float = 0.8
     sequence_min_length_ratio: float = 1.0

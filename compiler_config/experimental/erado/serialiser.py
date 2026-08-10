@@ -30,12 +30,11 @@ def get_serializable_types():
     from compiler_config.experimental.erado.config import (
         EradoConfig,
         ErasureModel,
-        IdleGate,
         IdlingErrorConfig,
     )
 
     serializable_types = get_base_serializable_types().copy()
-    for type_ in (EradoConfig, IdlingErrorConfig, ErasureModel, IdleGate):
+    for type_ in (EradoConfig, IdlingErrorConfig, ErasureModel):
         if issubclass(type_, Enum):
             type_name = f"<enum '{type_.__module__}.{type_.__name__}'>"
         else:
