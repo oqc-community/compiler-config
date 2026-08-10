@@ -2,7 +2,7 @@
 # Copyright (c) 2023-2026 Oxford Quantum Circuits Ltd
 import pytest
 
-from compiler_config.experimental.erado import (
+from compiler_config.experimental.erado.config import (
     EradoConfig,
     ErasureModel,
     IdleGate,
