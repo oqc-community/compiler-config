@@ -50,7 +50,11 @@ def test_full_config_round_trip():
 
 @pytest.mark.parametrize("value", [1, 1000])
 def test_valid_repeats(value):
-    EradoConfig(repeats=value).validate()
+    config = EradoConfig(repeats=value)
+
+    config.validate()
+
+    assert config.repeats == value
 
 
 @pytest.mark.parametrize("value", [0, -1])
@@ -69,6 +73,8 @@ def test_valid_rates(field, value):
     setattr(config, field, value)
 
     config.validate()
+
+    assert getattr(config, field) == value
 
 
 @pytest.mark.parametrize(
