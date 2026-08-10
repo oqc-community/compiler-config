@@ -1,7 +1,7 @@
 # SPDX-License-Identifier: BSD-3-Clause
 # Copyright (c) 2023-2026 Oxford Quantum Circuits Ltd
 from dataclasses import dataclass
-from enum import IntEnum, auto
+from enum import Enum
 from typing import Optional
 
 from compiler_config.config import QuantumResultsFormat
@@ -12,15 +12,15 @@ from compiler_config.experimental.erado.serialiser import (
 from compiler_config.serialiser import json_dumps, json_loads
 
 
-class ErasureModel(IntEnum):
+class ErasureModel(Enum):
     """Erasure simulation implementation used for an Erado job.
 
     ``CIRCUIT_SAMPLER`` samples a circuit for each shot. ``TRANSPILER_PASS``
     inserts erasure checks into the circuit before execution.
     """
 
-    CIRCUIT_SAMPLER = auto()
-    TRANSPILER_PASS = auto()
+    CIRCUIT_SAMPLER = "circuit_sampler"
+    TRANSPILER_PASS = "transpiler_pass"
 
 
 class IdleGate(IntEnum):
