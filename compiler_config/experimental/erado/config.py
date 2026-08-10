@@ -25,7 +25,17 @@ class ErasureModel(Enum):
 
 @dataclass
 class IdlingErrorConfig:
-    """Settings passed to Erado's idle-period padding operation."""
+    """Settings passed to Erado's idle-period padding operation.
+
+    Attributes:
+        max_idle_length: Maximum number of idle gates inserted into an idle period.
+        idle_gate: Qiskit gate name inserted during idle periods. Erado currently
+            supports ``"id"``, ``"x"``, ``"y"`` and ``"z"``.
+        circuit_gate_time: Unit duration assigned to each existing circuit gate.
+        idle_gate_time: Unit duration assigned to each inserted idle gate.
+        sequence_min_length_ratio: Minimum ratio between an idle period and the
+            inserted gate sequence.
+    """
 
     max_idle_length: int = 14
     idle_gate: str = "id"
@@ -36,7 +46,19 @@ class IdlingErrorConfig:
 
 @dataclass
 class EradoConfig:
-    """Configuration for the Erado simulator."""
+    """Configuration for the Erado simulator.
+
+    Attributes:
+        repeats: Number of simulation shots to request.
+        erasure_model: Erado simulation model used to execute the circuit.
+        erasure_rate: Probability of erasure at each eligible gate.
+        erasure_before_gates: Whether erasures occur before rather than after gates.
+        false_positive_rate: Probability that a negative erasure check is flipped.
+        false_negative_rate: Probability that a positive erasure check is flipped.
+        post_selection: Whether shots containing erasures are rejected and replaced.
+        get_fidelities: Whether Erado calculates per-shot fidelities.
+        idling_error: Optional settings for padding and simulating idle periods.
+    """
 
     repeats: int = 1000
     erasure_model: ErasureModel = ErasureModel.CIRCUIT_SAMPLER
