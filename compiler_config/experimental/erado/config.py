@@ -57,15 +57,13 @@ class EradoConfig:
             serializable_types=get_serializable_types(),
         )
 
-    def from_json(self, json: str):
-        vars(self).update(
-            vars(json_loads(json, serializable_types=get_serializable_types()))
-        )
-        return self
-
     @classmethod
-    def create_from_json(cls, json: str):
-        return cls().from_json(json)
+    def from_json(cls, json: str):
+        config = json_loads(json, serializable_types=get_serializable_types())
+        if not isinstance(config, cls):
+            raise ValueError("JSON does not contain an EradoConfig.")
+        config.validate()
+        return config
 
     def validate(self):
         if not 0 <= self.erasure_rate <= 1:

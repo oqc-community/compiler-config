@@ -12,7 +12,7 @@ from compiler_config.experimental.erado.config import (
 def test_default_config_round_trip():
     config = EradoConfig()
 
-    deserialised_config = EradoConfig.create_from_json(config.to_json())
+    deserialised_config = EradoConfig.from_json(config.to_json())
 
     assert deserialised_config == config
     assert type(deserialised_config.erasure_model) is ErasureModel
@@ -39,7 +39,7 @@ def test_full_config_round_trip():
     )
 
     serialised_config = config.to_json()
-    deserialised_config = EradoConfig.create_from_json(serialised_config)
+    deserialised_config = EradoConfig.from_json(serialised_config)
 
     assert deserialised_config == config
     assert type(deserialised_config.erasure_model) is ErasureModel
@@ -82,3 +82,10 @@ def test_invalid_rates(field, value):
 
     with pytest.raises(ValueError, match="rate must be between 0 and 1"):
         config.validate()
+
+
+def test_from_json_validates_config():
+    serialised_config = EradoConfig(repeats=0).to_json()
+
+    with pytest.raises(ValueError, match="Repeats must be positive"):
+        EradoConfig.from_json(serialised_config)
