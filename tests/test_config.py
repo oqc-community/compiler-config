@@ -123,27 +123,27 @@ def test_driven_reset_backwards_compatibility(json_template_path: Path):
     assert config.driven_reset is False
 
 
-def test_debug_defaults_false():
+def test_enable_debug_info_defaults_false():
     config = CompilerConfig()
-    assert config.debug is False
+    assert config.enable_debug_info is False
 
 
 @pytest.mark.parametrize("debug_flag", [True, False])
-def test_debug_serialisation_deserialisation_roundtrip(debug_flag):
-    config = CompilerConfig(debug=debug_flag)
-    assert config.debug == debug_flag
+def test_enable_debug_info_serialisation_deserialisation_roundtrip(debug_flag):
+    config = CompilerConfig(enable_debug_info=debug_flag)
+    assert config.enable_debug_info == debug_flag
     decode_config = CompilerConfig.create_from_json(config.to_json())
-    assert decode_config.debug == debug_flag
+    assert decode_config.enable_debug_info == debug_flag
 
 
-def test_debug_backwards_compatibility(json_template_path: Path):
-    """Tests that all legacy files are readable and that debug mode defaults to disabled.
+def test_enable_debug_info_backwards_compatibility(json_template_path: Path):
+    """Tests that all legacy files are readable and that debug info defaults to disabled.
 
     :param json_template: Fixture that provides the path to each JSON template file
         in the templates directory.
     """
     config = CompilerConfig.create_from_json(get_contents(json_template_path))
-    assert config.debug is False
+    assert config.enable_debug_info is False
 
 
 def test_all_config_optimizations():
