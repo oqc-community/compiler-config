@@ -233,6 +233,7 @@ class CompilerConfig:
         post_selection: bool = False,
         pre_selection: bool = False,
         driven_reset: bool = False,
+        enable_debug_info: bool = False,
     ):
         self.repeats: Optional[int] = repeats
         self.repetition_period: Optional[float] = repetition_period
@@ -245,6 +246,7 @@ class CompilerConfig:
         self.pre_selection: bool = pre_selection
         self.post_selection: bool = post_selection
         self.driven_reset: bool = driven_reset
+        self.enable_debug_info: bool = enable_debug_info
 
         if repetition_period:
             warnings.warn(
