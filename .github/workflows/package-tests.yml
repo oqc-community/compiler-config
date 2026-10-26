@@ -37,7 +37,17 @@ jobs:
         run: |
           poetry run ruff check
           poetry run ruff format --check
-          poetry run pip-audit --desc
+          ignore_args=(
+            # Filelock vulnerability, requires python 3.11+
+            # TODO(COMPILER-1510): Update filelock and remove ignores when python 3.10 is dropped.
+            --ignore-vuln CVE-2026-112906
+            --ignore-vuln CVE-2026-112940
+            --ignore-vuln CVE-2026-112914
+            --ignore-vuln CVE-2026-112913
+            --ignore-vuln CVE-2026-112937
+            --ignore-vuln CVE-2026-112907
+          )
+          poetry run pip-audit --desc "${ignore_args[@]}"
           
 
 
