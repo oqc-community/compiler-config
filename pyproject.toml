@@ -2,7 +2,7 @@
 name = "compiler-config"
 readme = "README.md"
 license = "BSD-3-Clause"
-requires-python = ">=3.11,<3.13"
+requires-python = ">=3.11,<3.14"
 dynamic = ["version"]
 authors = [
     { name = "Jamie Friel", email = "jfriel@oxfordquantumcircuits.com" }
