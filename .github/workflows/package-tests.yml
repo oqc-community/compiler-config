@@ -40,16 +40,21 @@ jobs:
           ignore_args=()
           poetry run pip-audit --desc "${ignore_args[@]}"
           
-
+  python-matrix:
+    name: Python versions
+    uses: ./.github/workflows/python-matrix.yaml
+    with:
+      repository: ${{ inputs.repository }}
 
   unit-tests:
     name: Unit Tests
+    needs: python-matrix
     runs-on: ${{ matrix.os }}
     strategy:
       fail-fast: true
       matrix:
         os: [ ubuntu-22.04, macos-latest, windows-latest ]
-        python: ["3.10", "3.11", "3.12"]
+        python: ${{ fromJSON(needs.python-matrix.outputs.versions) }}
     defaults:
       run:
         shell: bash
