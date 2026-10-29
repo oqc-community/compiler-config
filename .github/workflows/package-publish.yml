@@ -8,9 +8,6 @@ on:
         type: string
         required: true
 
-env:
-  PYTHON_VERSION: "3.10"
-
 jobs:
   final-tests: 
     name: Final tests
@@ -37,7 +34,7 @@ jobs:
       - name: Set up Python
         uses: actions/setup-python@v7
         with:
-          python-version: ${{ env.PYTHON_VERSION }}
+          python-version-file: .github/.python-version
 
       - name: Install packaging
         run: |
